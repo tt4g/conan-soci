@@ -1,0 +1,12 @@
+
+*.pyc
+test_package/build
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/

@@ -1,0 +1,8 @@
+{
+  "python.linting.pylintEnabled": true,
+  "python.pythonPath": "${workspaceFolder}/venv/Scripts/python",
+  "python.venvFolders": [
+    ".venv",
+    "venv"
+  ]
+}
