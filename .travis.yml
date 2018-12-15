@@ -2,6 +2,9 @@
 env:
    global:
      - CONAN_REFERENCE: "SOCI/4.0.0"
+     - CONAN_USERNAME: "user"
+     - CONAN_LOGIN_USERNAME: "user"
+     - CONAN_CHANNEL: "channel"
 
 linux: &linux
    os: linux
