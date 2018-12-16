@@ -1,6 +1,6 @@
 import os
 
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, CMake, tools, RunEnvironment
 
 
 class SociTestConan(ConanFile):
@@ -20,6 +20,14 @@ class SociTestConan(ConanFile):
         self.copy('*.so*', dst='bin', src='lib')
 
     def test(self):
-        if not tools.cross_building(self.settings):
-            os.chdir("bin")
-            self.run(".%sexample" % os.sep)
+        build_type = self.settings.build_type
+        env_build = RunEnvironment(self)
+
+        with tools.environment_append(env_build.vars):
+            if self.settings.os == "Macos":
+                # DYLD_LIBRARY_PATH environment variable is not directly transferred to the child process.
+                # https://docs.conan.io/en/latest/reference/build_helpers/run_environment.html
+                dyld_library_path = os.environ["DYLD_LIBRARY_PATH"]
+                self.run("DYLD_LIBRARY_PATH=%s ctest --build-config %s" % (dyld_library_path, build_type))
+            else:
+                self.run("ctest --build-config %s" % build_type)
