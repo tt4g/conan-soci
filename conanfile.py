@@ -393,29 +393,33 @@ conan_basic_setup()''')
         self.copy(pattern="*.a", dst="lib", keep_path=False)
 
     def package_info(self):
+        # Library name has suffix ABI version if Windows.
+        # It's SOCI major and minor of version.
+        lib_suffix = "_%s_%s" % tuple(self.version.split(".")[0:2]) if self.settings.os == "Windows" else ""
+
         self.cpp_info.includedirs = ["include"]
-        self.cpp_info.libs = ["soci_core"]
+        self.cpp_info.libs = ["soci_core%s" % lib_suffix]
 
         if self.options.soci_empty:
-            self.cpp_info.libs.append("soci_empty")
+            self.cpp_info.libs.append("soci_empty%s" % lib_suffix)
 
         if self.options.with_db2:
-            self.cpp_info.libs.append("soci_db2")
+            self.cpp_info.libs.append("soci_db2%s" % lib_suffix)
 
         if self.options.with_firebird:
-            self.cpp_info.libs.append("soci_firebird")
+            self.cpp_info.libs.append("soci_firebird%s" % lib_suffix)
 
         if self.options.with_mysql:
-            self.cpp_info.libs.append("soci_mysql")
+            self.cpp_info.libs.append("soci_mysql%s" % lib_suffix)
 
         if self.options.with_odbc:
-            self.cpp_info.libs.append("soci_odbc")
+            self.cpp_info.libs.append("soci_odbc%s" % lib_suffix)
 
         if self.options.with_oracle:
-            self.cpp_info.libs.append("soci_oracle")
+            self.cpp_info.libs.append("soci_oracle%s" % lib_suffix)
 
         if self.options.with_postgresql:
-            self.cpp_info.libs.append("soci_postgresql")
+            self.cpp_info.libs.append("soci_postgresql%s" % lib_suffix)
 
         if self.options.with_sqlite3:
-            self.cpp_info.libs.append("soci_sqlite3")
+            self.cpp_info.libs.append("soci_sqlite3%s" % lib_suffix)
