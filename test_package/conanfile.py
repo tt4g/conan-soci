@@ -15,9 +15,14 @@ class SociTestConan(ConanFile):
         cmake.build()
 
     def imports(self):
+        lib_dir = "lib"
+        if self.settings.os != "Windows":
+            if str(self.settings.arch) in ["x86_64", "ppc64", "ppc64le", "mips64", "armv8", "sparcv9"]:
+                lib_dir = "lib64"
+
         self.copy("*.dll", dst="bin", src="bin")
-        self.copy("*.dylib*", dst="bin", src="lib")
-        self.copy('*.so*', dst='bin', src='lib')
+        self.copy("*.dylib*", dst="bin", src=lib_dir)
+        self.copy("*.so*", dst="bin", src=lib_dir)
 
     def test(self):
         build_type = self.settings.build_type
