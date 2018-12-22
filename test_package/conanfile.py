@@ -29,5 +29,8 @@ class SociTestConan(ConanFile):
                 # https://docs.conan.io/en/latest/reference/build_helpers/run_environment.html
                 dyld_library_path = os.environ["DYLD_LIBRARY_PATH"]
                 self.run("DYLD_LIBRARY_PATH=%s ctest --output-on-failure --build-config %s" % (dyld_library_path, build_type))
-            else:
+            elif self.settings.os == "Windows":
                 self.run("ctest --output-on-failure --build-config %s" % build_type)
+            else:
+                ld_library_path = os.environ["LD_LIBRARY_PATH"]
+                self.run("LD_LIBRARY_PATH=%s ctest --output-on-failure --build-config %s" % (ld_library_path, build_type))
