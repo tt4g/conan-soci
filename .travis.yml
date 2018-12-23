@@ -5,6 +5,7 @@ env:
      - CONAN_USERNAME: "user"
      - CONAN_LOGIN_USERNAME: "user"
      - CONAN_CHANNEL: "channel"
+     - CONAN_BUILD_POLICY: "missing"
 
 linux: &linux
    os: linux
