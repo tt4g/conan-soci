@@ -31,4 +31,4 @@ install:
   - conan user # It creates the conan data directory
 
 test_script:
-  - conan create . %CONAN_SUBJECT%/%CONAN_CHANNEL%
+  - conan create . %CONAN_USERNAME%/%CONAN_CHANNEL%
