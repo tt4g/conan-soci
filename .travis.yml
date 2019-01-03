@@ -6,6 +6,7 @@ env:
      - CONAN_LOGIN_USERNAME: "user"
      - CONAN_CHANNEL: "channel"
      - CONAN_BUILD_POLICY: "missing"
+     - CONAN_REMOTES: "https://api.bintray.com/conan/bincrafters/public-conan"
 
 linux: &linux
    os: linux
@@ -74,7 +75,6 @@ matrix:
 install:
   - chmod +x .travis/install.sh
   - ./.travis/install.sh
-  - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 
 script:
   - chmod +x .travis/run.sh
