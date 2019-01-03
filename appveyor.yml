@@ -9,6 +9,8 @@ environment:
     CONAN_CHANNEL: "channel"
     CONAN_BUILD_POLICY: "missing"
     CONAN_REMOTES: "https://api.bintray.com/conan/bincrafters/public-conan"
+    CONAN_BUILD_TYPES: "Release,Debug"
+    CONAN_ARCHS: "x86_64"
 
     matrix:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
@@ -18,13 +20,6 @@ environment:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           CONAN_VISUAL_VERSIONS: 15
 
-platform:
-  - Win32
-  - x64
-
-configuration:
-  - Release
-
 install:
   - set PATH=%PATH%;%PYTHON%/Scripts/
   - pip.exe install conan --upgrade
@@ -32,4 +27,4 @@ install:
   - conan user # It creates the conan data directory
 
 test_script:
-  - conan create . %CONAN_USERNAME%/%CONAN_CHANNEL%
+  - python build.py
