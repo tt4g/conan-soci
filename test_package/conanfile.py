@@ -14,6 +14,7 @@ class SociTestConan(ConanFile):
     default_options = {
         "SOCI:soci_static": False,
         "SOCI:with_postgresql": True,
+        "SOCI:with_boost": False, # https://github.com/SOCI/soci/issues/679
 
         # dependency options
         "libpq:shared": True,
