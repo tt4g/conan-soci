@@ -16,6 +16,8 @@ SOCI:soci_static=False
 SOCI:with_boost=False
 SOCI:with_mysql=True
 mysql-connector-c:shared=True
+mysql-connector-c:with_ssl=True
+mysql-connector-c:with_zlib=True
 OpenSSL:shared=True
 zlib:shared=True
 

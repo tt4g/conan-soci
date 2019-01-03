@@ -8,18 +8,23 @@ class SociTestConan(ConanFile):
     generators = "cmake"
     requires = (
         ("libpq/9.6.9@bincrafters/stable"), # SOCI PostgreSQL backend
-        ("OpenSSL/1.0.2p@conan/stable"), # dependency: libpq
-        ("zlib/1.2.11@conan/stable") # dependency: libpq
+        ("mysql-connector-c/6.1.11@bincrafters/stable"), # SOCI MySQL backend
+        ("OpenSSL/1.0.2p@conan/stable"), # dependency: libpq, mysql-connector-c
+        ("zlib/1.2.11@conan/stable") # dependency: libpq, mysql-connector-c
     )
     default_options = {
         "SOCI:soci_static": False,
         "SOCI:with_postgresql": True,
+        "SOCI:with_mysql": True,
         "SOCI:with_boost": False, # https://github.com/SOCI/soci/issues/679
 
         # dependency options
         "libpq:shared": True,
         "libpq:with_openssl": True,
         "libpq:with_zlib": True,
+        "mysql-connector-c:shared": True,
+        "mysql-connector-c:with_ssl": True,
+        "mysql-connector-c:with_zlib": True,
         "OpenSSL:shared": True,
         "zlib:shared": True,
         "zlib:minizip": False
