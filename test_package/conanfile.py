@@ -6,6 +6,23 @@ from conans import ConanFile, CMake, tools, RunEnvironment
 class SociTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
+    requires = (
+        ("libpq/9.6.9@bincrafters/stable"), # SOCI PostgreSQL backend
+        ("OpenSSL/1.0.2p@conan/stable"), # dependency: libpq
+        ("zlib/1.2.11@conan/stable") # dependency: libpq
+    )
+    default_options = {
+        "SOCI:soci_static": False,
+        "SOCI:with_postgresql": True,
+
+        # dependency options
+        "libpq:shared": True,
+        "libpq:with_openssl": True,
+        "libpq:with_zlib": True,
+        "OpenSSL:shared": True,
+        "zlib:shared": True,
+        "zlib:minizip": False
+    }
 
     def build(self):
         cmake = CMake(self)
