@@ -183,7 +183,7 @@ conan_basic_setup()''')
 
     def requirements(self):
         if self.options.with_boost:
-            self.requires("boost/1.68.0@conan/stable")
+            self.requires("boost/1.69.0@conan/stable")
 
         if self.options.with_db2:
             if self._requires_db2():
