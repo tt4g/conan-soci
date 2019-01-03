@@ -14,7 +14,6 @@ SOCI:soci_empty=True
 
 [generators]
 cmake
-
 ```
 
 ### Without empty backend
@@ -42,5 +41,4 @@ SOCI:with_postgresql=True
 
 [generators]
 cmake
-
 ```
