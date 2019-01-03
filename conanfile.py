@@ -224,10 +224,6 @@ conan_basic_setup()''')
         cmake.definitions["SOCI_TESTS"] = self.options.soci_tests
         cmake.definitions["WITH_BOOST"] = self.options.with_boost
 
-        # TODO {backend}_INCLUDE_DIR and {backend}_LIBRARIES from deps_cpp_info
-        # self.deps_cpp_info["libpq"].include_paths
-        # self.deps_cpp_info["libpq"].libdirs
-
         cmake.definitions["SOCI_EMPTY"] = self.options.soci_empty
         if self.options.soci_empty:
             if self.options.soci_empty_test_connstr:
