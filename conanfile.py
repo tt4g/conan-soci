@@ -318,7 +318,7 @@ conan_basic_setup()''')
                 cmake.definitions["SOCI_POSTGRESQL_TEST_CONNSTR"] = \
                     self.options.soci_postgresql_test_connstr
 
-            if self.soci_postgresql_nosinglerowmode:
+            if self.options.soci_postgresql_nosinglerowmode:
                 cmake.definitions["SOCI_POSTGRESQL_NOSINGLEROWMODE"] = True
 
         cmake.definitions["WITH_SQLITE3"] = self.options.with_sqlite3
