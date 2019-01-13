@@ -9,12 +9,16 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
-add_executable(soci_empty_backend soci_empty_backend.cpp)
-target_link_libraries(soci_empty_backend ${CONAN_LIBS})
+add_executable(conan_soci_backend_test
+  soci_empty_backend.cpp
+  soci_mysql_backend.cpp
+  soci_postgresql_backend.cpp
+)
+target_link_libraries(conan_soci_backend_test ${CONAN_LIBS})
 
 enable_testing()
 add_test(
-  NAME soci_empty_backend
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-  COMMAND "$<TARGET_FILE:soci_empty_backend>"
+  NAME conan_soci_backend_test
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+  COMMAND "$<TARGET_FILE:conan_soci_backend_test>"
 )
