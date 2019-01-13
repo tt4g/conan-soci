@@ -49,6 +49,7 @@ class SociConan(ConanFile):
         "postgresql_include_dir": "ANY",
         "postgresql_libraries": "ANY",
         "soci_postgresql_test_connstr": "ANY",
+        "soci_postgresql_nosinglerowmode": [True, False],
         "with_sqlite3": [True, False],
         "sqlite_include_dir": "ANY",
         "sqlite_libraries": "ANY",
@@ -89,6 +90,7 @@ class SociConan(ConanFile):
         "postgresql_include_dir": None,
         "postgresql_libraries": None,
         "soci_postgresql_test_connstr": None,
+        "soci_postgresql_nosinglerowmode": False,
         "with_sqlite3": False,
         "sqlite_include_dir": None,
         "sqlite_libraries": None,
@@ -315,6 +317,9 @@ conan_basic_setup()''')
             if self.options.soci_postgresql_test_connstr:
                 cmake.definitions["SOCI_POSTGRESQL_TEST_CONNSTR"] = \
                     self.options.soci_postgresql_test_connstr
+
+            if self.soci_postgresql_nosinglerowmode:
+                cmake.definitions["SOCI_POSTGRESQL_NOSINGLEROWMODE"] = True
 
         cmake.definitions["WITH_SQLITE3"] = self.options.with_sqlite3
         if self.options.with_sqlite3:
