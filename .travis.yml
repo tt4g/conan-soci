@@ -8,22 +8,6 @@ env:
      - CONAN_BUILD_POLICY: "missing"
      - CONAN_REMOTES: "https://api.bintray.com/conan/bincrafters/public-conan"
 
-services:
-  - mysql
-  - postgresql
-
-addons:
-  postgresql: "10"
-  apt:
-    sources:
-      - mysql-5.7-trusty
-    packages:
-      - mysql-server
-      - mysql-client
-      - postgresql-10
-      - postgresql-client-10
-      - postgresql-server-dev-10
-
 linux: &linux
    os: linux
    dist: xenial
@@ -87,20 +71,6 @@ matrix:
       - <<: *osx
         osx_image: xcode10
         env: CONAN_APPLE_CLANG_VERSIONS=10.0
-
-before_install:
-  # MySQL 5.7: reset password
-  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('mysql_root_pass') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
-  - sudo mysql_upgrade -u root -pmysql_root_pass
-  - sudo service mysql restart
-  # MySQL setup
-  - mysql -u root -pmysql_root_pass -e "CREATE DATABASE IF NOT EXISTS conan_soci_test;"
-  - mysql -u root -pmysql_root_pass -e "CREATE USER 'conan_soci_user'@'localhost' IDENTIFIED BY PASSWORD 'conan_soci_pass';"
-  - mysql -u root -pmysql_root_pass -e "GRANT ALL ON stockmarket.* TO 'conan_soci_user'@'localhost';"
-  # PostgreSQL setup
-  - psql -U postgres -c "CREATE DATABASE conan_soci_test;"
-  - psql -U postgres -c "CREATE USER 'conan_soci_user' WITH PASSWORD 'conan_soci_pass';"
-  - psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE conan_soci_test to conan_soci_user;"
 
 install:
   - chmod +x .travis/install.sh
