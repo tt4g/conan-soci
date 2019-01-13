@@ -7,4 +7,6 @@ int main() {
     soci::session sql(backendFactory, "dummy connection");
 
     sql << "select 1 as one";
+
+    return 0;
 }
