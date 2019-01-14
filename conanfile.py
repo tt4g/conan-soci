@@ -1,4 +1,5 @@
 from conans import ConanFile, CMake, tools, AutoToolsBuildEnvironment, MSBuild
+import os
 
 
 class SociConan(ConanFile):
@@ -169,7 +170,16 @@ conan_basic_setup()''')
         :returns: true if require conan libpq, otherwise false.
         :rtype: bool
         """
-        # use libpq when not defined postgresql_include_dir and postgresql_libraries
+        # use libpq package if _set_postgresql_paths() is true.
+        return self._set_postgresql_paths()
+
+    def _set_postgresql_paths(self):
+        """check CMake definition related to  PostgreSQL backend path.
+
+        :returns: true if set libpq libraries path, otherwise false.
+        :rtype: bool
+        """
+        # if consumer not defined.
         return (not self.options.postgresql_include_dir
                 and not self.options.postgresql_libraries)
 
@@ -219,6 +229,8 @@ conan_basic_setup()''')
                 self.requires("sqlite3/3.25.3@bincrafters/stable")
 
     def build(self):
+        _lib_ext = "lib" if self.settings.os == "Windows" else "so"
+
         cmake = CMake(self, build_type=self.settings.build_type)
 
         cmake.definitions["SOCI_CXX_C11"] = self.options.soci_cxx_c11
@@ -310,9 +322,23 @@ conan_basic_setup()''')
 
         cmake.definitions["WITH_POSTGRESQL"] = self.options.with_postgresql
         if self.options.with_postgresql:
-            if not self._requires_libpq():
-                cmake.definitions["POSTGRESQL_INCLUDE_DIR"] = self.options.postgresql_include_dir
-                cmake.definitions["POSTGRESQL_LIBRARIES"] = self.options.postgresql_libraries
+
+            _postgresql_include_dir = None
+            _postgresql_libraries = None
+            if self._set_postgresql_paths():
+                _postgresql_include_dir = self.deps_cpp_info["libpq"].include_paths[0]
+                _postgresql_libraries = os.path.join(
+                    self.deps_cpp_info["libpq"].lib_paths[0], ("libpq.%s" % _lib_ext))
+
+            else:
+                _postgresql_include_dir = self.options.postgresql_include_dir
+                _postgresql_libraries = self.options.postgresql_libraries
+
+            if _postgresql_include_dir and _postgresql_libraries:
+                cmake.definitions["POSTGRESQL_INCLUDE_DIR"] = _postgresql_include_dir
+
+            if _postgresql_libraries:
+                cmake.definitions["POSTGRESQL_LIBRARIES"] = _postgresql_libraries
 
             if self.options.soci_postgresql_test_connstr:
                 cmake.definitions["SOCI_POSTGRESQL_TEST_CONNSTR"] = \
