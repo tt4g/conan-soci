@@ -3,7 +3,7 @@
 
 int main() {
     try {
-        soci::session sql(soci::mysql,
+        soci::session sql(*soci::factory_mysql(),
                           "user='conan_soci_user' password='conan_soci_pass'"
                           " host='127.0.0.1' port=3306 dbname='conan_soci_test'"
                           " charset='utf8' connect_timeout=10");

@@ -3,7 +3,7 @@
 
 int main() {
     try {
-        soci::session sql(soci::postgresql,
+        soci::session sql(*soci::factory_postgresql(),
                           "user='conan_soci_user' password='conan_soci_pass'"
                           " host='127.0.0.1' port=5432 dbname='conan_soci_test'"
                           " application_name='conan_soci' connect_timeout=10"
