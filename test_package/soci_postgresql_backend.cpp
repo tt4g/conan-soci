@@ -8,7 +8,7 @@ int main() {
                           " host='127.0.0.1' port=5432 dbname='conan_soci_test'"
                           " application_name='conan_soci' connect_timeout=10"
                           " options='-c client_encoding=utf8'");
-    } catch (const soci::soci_error &ex) {
+    } catch (const soci::soci_error &/* ex */) {
         // don't connect server in tests.
         // pass if compile succeeded.
         return 0;
