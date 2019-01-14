@@ -138,8 +138,16 @@ conan_basic_setup()''')
         :returns: true if require conan mysql, otherwise false.
         :rtype: bool
         """
-        # use mysql when not defined mysql_dir
-        # OR not definied mysql_include_dir and mysql_libraries
+        # use mysql-connector-c package if _set_mysql_paths() is true.
+        return self._set_mysql_paths()
+
+    def _set_mysql_paths(self):
+        """check CMake definition related to  MySQL backend path.
+
+        :returns: true if set mysql libraries path, otherwise false.
+        :rtype: bool
+        """
+        # if consumer not defined.
         return (not self.options.mysql_dir
                 or (not self.options.mysql_include_dir
                     and not self.options.mysql_libraries))
@@ -229,7 +237,8 @@ conan_basic_setup()''')
                 self.requires("sqlite3/3.25.3@bincrafters/stable")
 
     def build(self):
-        _lib_ext = "lib" if self.settings.os == "Windows" else "so"
+        _is_os_windows = self.settings.os == "Windows"
+        _lib_ext = "lib" if _is_os_windows else "so"
 
         cmake = CMake(self, build_type=self.settings.build_type)
 
@@ -272,17 +281,35 @@ conan_basic_setup()''')
 
         cmake.definitions["WITH_MYSQL"] = self.options.with_mysql
         if self.options.with_mysql:
-            if not self._requires_mysql():
+
+            _mysql_dir = None
+            _mysql_include_dir = None
+            _mysql_libraries = None
+            _mysql_lib_name = "libmysql" if _is_os_windows else "libmysqlclient"
+            if self._set_mysql_paths():
+                _mysql_include_dir = self.deps_cpp_info["mysql-connector-c"].include_paths[0]
+                _mysql_libraries = os.path.join(
+                    self.deps_cpp_info["mysql-connector-c"].lib_paths[0],
+                    ("%s.%s" % (_mysql_lib_name, _lib_ext))
+                )
+            else:
                 if self.options.mysql_dir:
-                    cmake.definitions["MYSQL_DIR"] = self.options.mysql_dir
+                    _mysql_dir = self.options.mysql_dir
 
                 if self.options.mysql_include_dir:
-                    cmake.definitions["MYSQL_INCLUDE_DIR"] = \
-                        self.options.mysql_include_dir
+                    _mysql_include_dir = self.options.mysql_include_dir
 
                 if self.options.mysql_libraries:
-                    cmake.definitions["MYSQL_LIBRARIES"] = \
-                        self.options.mysql_libraries
+                    _mysql_libraries = self.options.mysql_libraries
+
+            if _mysql_dir:
+                cmake.definitions["MYSQL_DIR"] = _mysql_dir
+
+            if _mysql_include_dir:
+                cmake.definitions["MYSQL_INCLUDE_DIR"] = _mysql_include_dir
+
+            if _mysql_libraries:
+                cmake.definitions["MYSQL_LIBRARIES"] = _mysql_libraries
 
             if self.options.soci_mysql_test_connstr:
                 cmake.definitions["SOCI_MYSQL_TEST_CONNSTR"] = \
