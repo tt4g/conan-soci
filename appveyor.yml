@@ -11,6 +11,7 @@ environment:
     CONAN_REMOTES: "https://api.bintray.com/conan/bincrafters/public-conan"
     CONAN_BUILD_TYPES: "Release,Debug"
     CONAN_ARCHS: "x86_64"
+    CONAN_VISUAL_RUNTIMES: "MT,MD"
 
     matrix:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
