@@ -16,7 +16,6 @@ class SociTestConan(ConanFile):
     # TODO: remove backend options, dependency options
     default_options = {
         "SOCI:shared": False,
-        "SOCI:soci_cxx_c11": True,
         # backend options
         "SOCI:with_postgresql": True,
         "SOCI:with_mysql": True,
