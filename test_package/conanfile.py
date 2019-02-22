@@ -6,15 +6,18 @@ from conans import ConanFile, CMake, tools, RunEnvironment
 class SociTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
+    # TODO: Remove requires.
     requires = (
         ("libpq/9.6.9@bincrafters/stable"), # SOCI PostgreSQL backend
         ("mysql-connector-c/6.1.11@bincrafters/stable"), # SOCI MySQL backend
         ("OpenSSL/1.0.2p@conan/stable"), # dependency: libpq, mysql-connector-c
         ("zlib/1.2.11@conan/stable") # dependency: libpq, mysql-connector-c
     )
+    # TODO: remove backend options, dependency options
     default_options = {
         "SOCI:shared": False,
         "SOCI:soci_cxx_c11": True,
+        # backend options
         "SOCI:with_postgresql": True,
         "SOCI:with_mysql": True,
         "SOCI:with_boost": False, # https://github.com/SOCI/soci/issues/679
