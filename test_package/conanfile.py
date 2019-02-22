@@ -13,20 +13,20 @@ class SociTestConan(ConanFile):
         ("zlib/1.2.11@conan/stable") # dependency: libpq, mysql-connector-c
     )
     default_options = {
-        "SOCI:soci_static": False,
+        "SOCI:shared": False,
         "SOCI:with_postgresql": True,
         "SOCI:with_mysql": True,
         "SOCI:with_boost": False, # https://github.com/SOCI/soci/issues/679
 
         # dependency options
-        "libpq:shared": True,
+        "libpq:shared": False,
         "libpq:with_openssl": True,
         "libpq:with_zlib": True,
-        "mysql-connector-c:shared": True,
+        "mysql-connector-c:shared": False,
         "mysql-connector-c:with_ssl": True,
         "mysql-connector-c:with_zlib": True,
-        "OpenSSL:shared": True,
-        "zlib:shared": True,
+        "OpenSSL:shared": False,
+        "zlib:shared": False,
         "zlib:minizip": False
     }
 

@@ -11,15 +11,15 @@ zlib/1.2.11@conan/stable
 [build_requires]
 
 [options]
+SOCI:shared=False
 SOCI:soci_cxx_c11=False
-SOCI:soci_static=False
 SOCI:with_boost=False
 SOCI:with_mysql=True
-mysql-connector-c:shared=True
+mysql-connector-c:shared=False
 mysql-connector-c:with_ssl=True
 mysql-connector-c:with_zlib=True
-OpenSSL:shared=True
-zlib:shared=True
+OpenSSL:shared=False
+zlib:shared=False
 
 [generators]
 cmake

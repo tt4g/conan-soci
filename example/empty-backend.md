@@ -7,8 +7,8 @@ SOCI/4.0.0@tt4g/stable
 [build_requires]
 
 [options]
+SOCI:shared=False
 SOCI:soci_cxx_c11=False
-SOCI:soci_static=False
 SOCI:with_boost=False
 SOCI:soci_empty=True
 
@@ -28,16 +28,16 @@ SOCI/4.0.0@tt4g/stable
 [build_requires]
 
 [options]
-zlib:shared=True
-OpenSSL:shared=True
-libpq:shared=True
-libpq:with_openssl=True
-libpq:with_zlib=True
 SOCI:soci_cxx_c11=False
-SOCI:soci_static=False
+SOCI:shared=False
 SOCI:with_boost=False
 SOCI:soci_empty=False
 SOCI:with_postgresql=True
+libpq:shared=False
+libpq:with_openssl=True
+libpq:with_zlib=True
+zlib:shared=False
+OpenSSL:shared=False
 
 [generators]
 cmake

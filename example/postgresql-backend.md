@@ -10,15 +10,15 @@ zlib/1.2.11@conan/stable
 [build_requires]
 
 [options]
+SOCI:shared=False
 SOCI:soci_cxx_c11=False
-SOCI:soci_static=False
 SOCI:with_boost=False
 SOCI:with_postgresql=True
-libpq:shared=True
+libpq:shared=False
 libpq:with_openssl=True
 libpq:with_zlib=True
-OpenSSL:shared=True
-zlib:shared=True
+OpenSSL:shared=False
+zlib:shared=False
 
 [generators]
 cmake
