@@ -59,7 +59,7 @@ class SociConan(ConanFile):
     default_options = {
         "shared": True,
         "soci_cxx_c11":  False,
-        "soci_tests": True,
+        "soci_tests": False,
         "with_boost": True,
         "soci_empty": True,
         "soci_empty_test_connstr": None,
