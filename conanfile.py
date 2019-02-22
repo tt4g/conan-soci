@@ -238,7 +238,8 @@ conan_basic_setup()''')
 
     def build(self):
         _is_os_windows = self.settings.os == "Windows"
-        _lib_ext = "lib" if _is_os_windows else "so"
+        _shared_lib_ext = "lib" if _is_os_windows else "so"
+        _static_lib_ext = "lib" if _is_os_windows else "a"
 
         cmake = CMake(self, build_type=self.settings.build_type)
 
@@ -287,11 +288,12 @@ conan_basic_setup()''')
             _mysql_include_dir = None
             _mysql_libraries = None
             _mysql_lib_name = "libmysql" if _is_os_windows else "libmysqlclient"
+            _mysql_lib_ext = _shared_lib_ext if self.options["mysql-connector-c"].shared else _static_lib_ext
             if self._set_mysql_paths():
                 _mysql_include_dir = self.deps_cpp_info["mysql-connector-c"].include_paths[0]
                 _mysql_libraries = os.path.join(
                     self.deps_cpp_info["mysql-connector-c"].lib_paths[0],
-                    ("%s.%s" % (_mysql_lib_name, _lib_ext))
+                    ("%s.%s" % (_mysql_lib_name, _mysql_lib_ext))
                 )
             else:
                 if self.options.mysql_dir:
@@ -353,10 +355,11 @@ conan_basic_setup()''')
 
             _postgresql_include_dir = None
             _postgresql_libraries = None
+            _postgresql_lib_ext = _shared_lib_ext if self.options["libpq"].shared else _static_lib_ext
             if self._set_postgresql_paths():
                 _postgresql_include_dir = self.deps_cpp_info["libpq"].include_paths[0]
                 _postgresql_libraries = os.path.join(
-                    self.deps_cpp_info["libpq"].lib_paths[0], ("libpq.%s" % _lib_ext))
+                    self.deps_cpp_info["libpq"].lib_paths[0], ("libpq.%s" % _postgresql_lib_ext))
 
             else:
                 _postgresql_include_dir = self.options.postgresql_include_dir
