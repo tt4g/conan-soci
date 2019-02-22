@@ -14,6 +14,7 @@ class SociTestConan(ConanFile):
     )
     default_options = {
         "SOCI:shared": False,
+        "SOCI:soci_cxx_c11": True,
         "SOCI:with_postgresql": True,
         "SOCI:with_mysql": True,
         "SOCI:with_boost": False, # https://github.com/SOCI/soci/issues/679
