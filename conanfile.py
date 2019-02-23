@@ -287,8 +287,15 @@ conan_basic_setup()''')
             _mysql_dir = None
             _mysql_include_dir = None
             _mysql_libraries = None
-            _mysql_lib_name = "libmysql" if _is_os_windows else "libmysqlclient"
+
+            _mysql_lib_name = None
+            if _is_os_windows:
+                _mysql_lib_name = "libmysql" if self.options["mysql-connector-c"].shared else "mysqlclient"
+            else:
+                _mysql_lib_name = "libmysqlclient"
+
             _mysql_lib_ext = _shared_lib_ext if self.options["mysql-connector-c"].shared else _static_lib_ext
+
             if self._set_mysql_paths():
                 _mysql_include_dir = self.deps_cpp_info["mysql-connector-c"].include_paths[0]
                 _mysql_libraries = os.path.join(
