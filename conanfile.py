@@ -14,6 +14,7 @@ class SociConan(ConanFile):
     homepage = "http://soci.sourceforge.net/"
     topics = ("conan", "soci", "sql")
     exports = ["LICENSE"]
+    exports_sources = ["CMakeLists.txt"]
     settings = "os", "compiler", "build_type", "arch"
     options = {
         "shared": [True, False],
@@ -98,19 +99,18 @@ class SociConan(ConanFile):
         "soci_sqlite_test_connstr": None
     }
     generators = "cmake"
+    _source_subfolder = "source_subfolder"
+    _build_subfolder = "build_subfolder"
 
     def source(self):
-        # TODO get source from archive after SOCI 4.0.0 released.
+        # TODO: get source from archive after SOCI 4.0.0 released.
         # source_url = "https://github.com/SOCI/soci"
         # tools.get("{0}/archive/{1}.tar.gz", source_url, self.version)
+        # extracted_dir = self.name + "-" + self.version
+        # os.rename(extracted_dir, self._source_subfolder)
 
-        self.run("git clone --depth 1 https://github.com/SOCI/soci.git")
-        self.run("cd soci && git checkout master")
-
-        tools.replace_in_file("soci/CMakeLists.txt", "project(SOCI)",
-                              '''project(SOCI)
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()''')
+        git = tools.Git(folder=self._source_subfolder)
+        git.clone(url="https://github.com/SOCI/soci.git", branch="master")
 
     def _requires_db2(self):
         """check requires conan db2.
@@ -236,12 +236,12 @@ conan_basic_setup()''')
             if self._requires_sqlite3():
                 self.requires("sqlite3/3.25.3@bincrafters/stable")
 
-    def build(self):
+    def _configure_cmake(self):
         _is_os_windows = self.settings.os == "Windows"
         _shared_lib_ext = "lib" if _is_os_windows else "so"
         _static_lib_ext = "lib" if _is_os_windows else "a"
 
-        cmake = CMake(self, build_type=self.settings.build_type)
+        cmake = CMake(self)
 
         cmake.definitions["SOCI_SHARED"] = self.options.shared
         cmake.definitions["SOCI_STATIC"] = not self.options.shared
@@ -397,65 +397,51 @@ conan_basic_setup()''')
                 cmake.definitions["SOCI_SQLITE3_TEST_CONNSTR"] = \
                     self.options.soci_sqlite_test_connstr
 
-        cmake.configure(source_folder="soci")
+        cmake.configure(build_folder=self._build_subfolder)
+        return cmake
 
-        # Windows: msbuild
-        # Unix: make && make install
-        # http://soci.sourceforge.net/doc/master/installation/
-        if self.settings.compiler == "Visual Studio":
-            msbuild = MSBuild(self)
-            msbuild.build(project_file="SOCI.sln")
-        else:
-            autotools = AutoToolsBuildEnvironment(self)
-            autotools.make()
-            autotools.install()
+    def build(self):
+        cmake = self._configure_cmake()
+        cmake.build()
 
     def package(self):
-        self.copy(pattern="LICENSE*", dst="licenses", src="soci")
-        self.copy(pattern="*.h", dst="include", src="include", keep_path=True)
-        # copy header exclude backends
-        self.copy(pattern="*.h", dst="include/soci", src="soci/include/soci",
-                  keep_path=True,
-                  excludes=("empty", "db2", "firebird", "mysql", "odbc",
-                            "oracle", "postgresql", "sqlite3",))
+        self.copy(pattern="LICENSE_1_0.txt*", dst="licenses", src=self._source_subfolder)
 
-        if self.options.soci_empty:
-            self.copy(pattern="*.h", dst="include/soci/empty",
-                      src="soci/include/soci/empty", keep_path=True)
+        cmake = self._configure_cmake()
+        cmake.install()
 
-        if self.options.with_db2:
-            self.copy(pattern="*.h", dst="include/soci/db2",
-                      src="soci/include/soci/db2", keep_path=True)
+    def _architecture_model(self):
+        """This _architecture_model was borrowed from conan-boost.
 
-        if self.options.with_firebird:
-            self.copy(pattern="*.h", dst="include/soci/firebird",
-                      src="soci/include/soci/firebird", keep_path=True)
+        * conan-boost: https://github.com/conan-community/conan-boost
+        * _b2_architecture: https://github.com/conan-community/conan-boost/blob/8ecc8350b9dfaee5d277218f6d6118052b08a386/conanfile.py#L430
 
-        if self.options.with_mysql:
-            self.copy(pattern="*.h", dst="include/soci/mysql",
-                      src="soci/include/soci/mysql", keep_path=True)
+        Copyright (c) 2017-2019 JFrog LTD
 
-        if self.options.with_odbc:
-            self.copy(pattern="*.h", dst="include/soci/odbc",
-                      src="soci/include/soci/odbc", keep_path=True)
+        MIT LICENSE
 
-        if self.options.with_oracle:
-            self.copy(pattern="*.h", dst="include/soci/oracle",
-                      src="soci/include/soci/oracle", keep_path=True)
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        if self.options.with_postgresql:
-            self.copy(pattern="*.h", dst="include/soci/postgresql",
-                      src="soci/include/soci/postgresql", keep_path=True)
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        if self.options.with_sqlite3:
-            self.copy(pattern="*.h", dst="include/soci/sqlite3",
-                      src="soci/include/soci/sqlite3", keep_path=True)
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+        CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        """
 
-        self.copy(pattern="*.lib", dst="lib", keep_path=False)
-        self.copy(pattern="*.dll", dst="bin", keep_path=False)
-        self.copy(pattern="*.so*", dst="lib", keep_path=False)
-        self.copy(pattern="*.dylib", dst="lib", keep_path=False)
-        self.copy(pattern="*.a", dst="lib", keep_path=False)
+        if str(self.settings.arch) in ["x86_64", "ppc64", "ppc64le", "mips64", "armv8", "sparcv9"]:
+            return "64"
+        else:
+            return "32"
 
     def package_info(self):
         # library name has prefix "lib".
@@ -467,6 +453,7 @@ conan_basic_setup()''')
         lib_name_args = (lib_prefix, lib_suffix)
 
         self.cpp_info.includedirs = ["include"]
+        self.cpp_info.libdirs = ["lib64"] if self._architecture_model() == "64" else ["lib"]
         self.cpp_info.libs = ["%ssoci_core%s" % lib_name_args]
 
         if self.options.soci_empty:
