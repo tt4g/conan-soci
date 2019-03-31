@@ -372,7 +372,7 @@ class SociConan(ConanFile):
                 _postgresql_include_dir = self.options.postgresql_include_dir
                 _postgresql_libraries = self.options.postgresql_libraries
 
-            if _postgresql_include_dir and _postgresql_libraries:
+            if _postgresql_include_dir:
                 cmake.definitions["POSTGRESQL_INCLUDE_DIR"] = _postgresql_include_dir
 
             if _postgresql_libraries:
@@ -396,6 +396,21 @@ class SociConan(ConanFile):
             if self.options.soci_sqlite_test_connstr:
                 cmake.definitions["SOCI_SQLITE3_TEST_CONNSTR"] = \
                     self.options.soci_sqlite_test_connstr
+
+        # Fixes: https://github.com/SOCI/soci/pull/712
+        # Unused CMake variables DB2_LIBRARIES, ORACLE_LIBRARIES, POSTGRESQL_LIBRARY,
+        # SQLITE3_LIBRARY.
+        if "DB2_LIBRARIES" in cmake.definitions:
+            cmake.definitions["DB2_LIBRARY"] = cmake.definitions["DB2_LIBRARIES"]
+
+        if "ORACLE_LIBRARIES" in cmake.definitions:
+            cmake.definitions["ORACLE_LIBRARY"] = cmake.definitions["ORACLE_LIBRARIES"]
+
+        if "POSTGRESQL_LIBRARIES" in cmake.definitions:
+            cmake.definitions["POSTGRESQL_LIBRARY"] = cmake.definitions["POSTGRESQL_LIBRARIES"]
+
+        if "SQLITE3_LIBRARIES" in cmake.definitions:
+            cmake.definitions["SQLITE3_LIBRARY"] = cmake.definitions["SQLITE3_LIBRARIES"]
 
         cmake.configure(build_folder=self._build_subfolder)
         return cmake
