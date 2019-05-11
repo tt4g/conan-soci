@@ -19,7 +19,6 @@ class SociTestConan(ConanFile):
         # backend options
         "SOCI:with_postgresql": True,
         "SOCI:with_mysql": True,
-        "SOCI:with_boost": False, # https://github.com/SOCI/soci/issues/679
 
         # dependency options
         "libpq:shared": False,
