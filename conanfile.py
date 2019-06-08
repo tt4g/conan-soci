@@ -469,10 +469,9 @@ class SociConan(ConanFile):
 
         self.cpp_info.includedirs = ["include"]
         self.cpp_info.libdirs = ["lib64"] if self._architecture_model() == "64" else ["lib"]
-        self.cpp_info.libs = ["%ssoci_core%s" % lib_name_args]
 
         if self.options.soci_empty:
-            self.cpp_info.libs.append("%ssoci_empty%s" %lib_name_args)
+            self.cpp_info.libs.append("%ssoci_empty%s" % lib_name_args)
 
         if self.options.with_db2:
             self.cpp_info.libs.append("%ssoci_db2%s" % lib_name_args)
@@ -494,3 +493,7 @@ class SociConan(ConanFile):
 
         if self.options.with_sqlite3:
             self.cpp_info.libs.append("%ssoci_sqlite3%s" % lib_name_args)
+
+        # All backend libraries of SOCI depend on soci_core.
+        # Add to the end of the library list so that soci_core is linked last. when linking.
+        self.cpp_info.libs.append("%ssoci_core%s" % lib_name_args)
