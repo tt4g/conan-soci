@@ -46,16 +46,7 @@ class SociTestConan(ConanFile):
 
     def test(self):
         build_type = self.settings.build_type
-        env_build = RunEnvironment(self)
 
-        with tools.environment_append(env_build.vars):
-            if self.settings.os == "Macos":
-                # DYLD_LIBRARY_PATH environment variable is not directly transferred to the child process.
-                # https://docs.conan.io/en/latest/reference/build_helpers/run_environment.html
-                dyld_library_path = os.environ["DYLD_LIBRARY_PATH"]
-                self.run("DYLD_LIBRARY_PATH=%s ctest --output-on-failure --build-config %s" % (dyld_library_path, build_type))
-            elif self.settings.os == "Windows":
-                self.run("ctest --output-on-failure --build-config %s" % build_type)
-            else:
-                ld_library_path = os.environ["LD_LIBRARY_PATH"]
-                self.run("LD_LIBRARY_PATH=%s ctest --output-on-failure --build-config %s" % (ld_library_path, build_type))
+        test_command = "ctest --output-on-failure --build-config %s" % (build_type,)
+
+        self.run(test_command, run_environment=True)
