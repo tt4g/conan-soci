@@ -191,6 +191,16 @@ class SociConan(ConanFile):
         return (not self.options.sqlite_include_dir
                 and not self.options.sqlite_libraries)
 
+    def configure(self):
+        if (self._requires_mysql() and self.options.shared
+            and self.settings.os != "Windows"):
+            # If use mysql-connector-c and SOCI:shared=True on UNIX-like OS,
+            # link failed by ld command: "relocation R_X86_64_PC32 against symbol
+            # `key_memory_mysql_options' can not be used when making a shared
+            #  object; recompile with -fPIC
+            # /usr/bin/ld: final link failed: Bad value"
+            self.options["mysql-connector-c"].shared = True
+
     def requirements(self):
         if self.options.with_boost:
             self.requires("boost/1.70.0@conan/stable")
