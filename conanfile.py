@@ -102,16 +102,6 @@ class SociConan(ConanFile):
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
 
-    def source(self):
-        # TODO: get source from archive after SOCI 4.0.0 released.
-        # source_url = "https://github.com/SOCI/soci"
-        # tools.get("{0}/archive/{1}.tar.gz", source_url, self.version)
-        # extracted_dir = self.name + "-" + self.version
-        # os.rename(extracted_dir, self._source_subfolder)
-
-        git = tools.Git(folder=self._source_subfolder)
-        git.clone(url="https://github.com/SOCI/soci.git", branch="master")
-
     def _requires_db2(self):
         """check requires conan db2.
 
@@ -235,6 +225,16 @@ class SociConan(ConanFile):
         if self.options.with_sqlite3:
             if self._requires_sqlite3():
                 self.requires("sqlite3/3.25.3@bincrafters/stable")
+
+    def source(self):
+        # TODO: get source from archive after SOCI 4.0.0 released.
+        # source_url = "https://github.com/SOCI/soci"
+        # tools.get("{0}/archive/{1}.tar.gz", source_url, self.version)
+        # extracted_dir = self.name + "-" + self.version
+        # os.rename(extracted_dir, self._source_subfolder)
+
+        git = tools.Git(folder=self._source_subfolder)
+        git.clone(url="https://github.com/SOCI/soci.git", branch="master")
 
     def _configure_cmake(self):
         _is_os_windows = self.settings.os == "Windows"
