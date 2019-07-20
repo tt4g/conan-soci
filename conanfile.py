@@ -435,39 +435,6 @@ class SociConan(ConanFile):
         cmake = self._configure_cmake()
         cmake.install()
 
-    def _architecture_model(self):
-        """This _architecture_model was borrowed from conan-boost.
-
-        * conan-boost: https://github.com/conan-community/conan-boost
-        * _b2_architecture: https://github.com/conan-community/conan-boost/blob/8ecc8350b9dfaee5d277218f6d6118052b08a386/conanfile.py#L430
-
-        Copyright (c) 2017-2019 JFrog LTD
-
-        MIT LICENSE
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-        CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-        """
-
-        if str(self.settings.arch) in ["x86_64", "ppc64", "ppc64le", "mips64", "armv8", "sparcv9"]:
-            return "64"
-        else:
-            return "32"
-
     def package_info(self):
         # library name has prefix "lib".
         lib_prefix = "lib" if self.settings.os == "Windows" and not self.options.shared else ""
@@ -478,7 +445,11 @@ class SociConan(ConanFile):
         lib_name_args = (lib_prefix, lib_suffix)
 
         self.cpp_info.includedirs = ["include"]
-        self.cpp_info.libdirs = ["lib64"] if self._architecture_model() == "64" else ["lib"]
+
+        if os.path.exists(os.path.join(self.package_folder, "lib64")):
+            self.cpp_info.libdirs = ["lib64"]
+        else:
+            self.cpp_info.libdirs = ["lib"]
 
         if self.options.soci_empty:
             self.cpp_info.libs.append("%ssoci_empty%s" % lib_name_args)
