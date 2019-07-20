@@ -2,7 +2,7 @@
 
 conan package for library [SOCI][SOCI sourceforge].
 
-**DO not use this repository work in progress**.
+**Do not use this repository work in progress**.
 
 ## Build Status
 
