@@ -7,6 +7,7 @@ class SociTestConan(ConanFile):
     default_options = {
         "SOCI:with_postgresql": True,
         "SOCI:with_mysql": True,
+        "SOCI:with_boost": False
     }
 
     def build(self):
