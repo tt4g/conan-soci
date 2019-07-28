@@ -54,7 +54,7 @@ class SociConan(ConanFile):
 
     def configure(self):
         if (self.options.with_mysql and self.options.shared
-            and self.settings.os != "Windows"):
+            and not tools.os_info.is_windows):
             # If use mysql-connector-c and SOCI:shared=True on UNIX-like OS,
             # link failed by ld command: "relocation R_X86_64_PC32 against symbol
             # `key_memory_mysql_options' can not be used when making a shared
@@ -101,10 +101,6 @@ class SociConan(ConanFile):
         git.clone(url="https://github.com/SOCI/soci.git", branch="master")
 
     def _configure_cmake(self):
-        _is_os_windows = self.settings.os == "Windows"
-        _shared_lib_ext = "lib" if _is_os_windows else "so"
-        _static_lib_ext = "lib" if _is_os_windows else "a"
-
         cmake = CMake(self)
 
         cmake.definitions["SOCI_SHARED"] = self.options.shared
@@ -140,10 +136,10 @@ class SociConan(ConanFile):
 
     def package_info(self):
         # library name has prefix "lib".
-        lib_prefix = "lib" if self.settings.os == "Windows" and not self.options.shared else ""
+        lib_prefix = "lib" if tools.os_info.is_windows and not self.options.shared else ""
         # Library name has suffix ABI version if Windows.
         # It's SOCI major and minor of version.
-        lib_suffix = "_%s_%s" % tuple(self.version.split(".")[0:2]) if self.settings.os == "Windows" else ""
+        lib_suffix = "_%s_%s" % tuple(self.version.split(".")[0:2]) if tools.os_info.is_windows else ""
 
         lib_name_args = (lib_prefix, lib_suffix)
 
