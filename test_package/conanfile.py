@@ -10,6 +10,14 @@ class SociTestConan(ConanFile):
         "SOCI:with_boost": False
     }
 
+    def requirements(self):
+        if tools.os_info.is_windows:
+            # NOTE: The version of OpenSSL is in conflict between
+            #       libpq/9.6.9 and mysql-connector-c/6.1.11,
+            #       This problem should be resolved by consumers overriding the
+            #       OpenSSL version.
+            self.requires("OpenSSL/1.0.2s@conan/stable")
+
     def build(self):
         cmake = CMake(self)
         # Current dir is "test_package/build/<build_id>" and CMakeLists.txt is
