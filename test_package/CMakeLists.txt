@@ -1,45 +1,38 @@
-cmake_minimum_required(VERSION 2.8.12)
-project(PackageTest CXX)
+cmake_minimum_required(VERSION 2.8.11)
+project(test_package CXX)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  # SOCI need to enable c++11 standard for clang or apple clang.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
-
-if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
-  # include/soci/rowset.h: warning: ‘template<class> class std::auto_ptr’ is deprecated [-Wdeprecated-declarations]
-  #     const cxx_details::auto_ptr<statement> st_;
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-endif()
-
 enable_testing()
 
-add_executable(soci_empty_backend soci_empty_backend.cpp)
-target_link_libraries(soci_empty_backend
-  PUBLIC
-    ${CONAN_LIBS})
+function(setup_ctest target)
+  target_link_libraries(${target}
+    PUBLIC
+      ${CONAN_LIBS})
+  # include/soci/rowset.h: warning: ‘template<class> class std::auto_ptr’ is deprecated [-Wdeprecated-declarations]
+  #     const cxx_details::auto_ptr<statement> st_;
+  target_compile_options(${target}
+    PUBLIC
+      $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated-declarations>
+      $<$<CXX_COMPILER_ID:Clang>:-Wno-deprecated-declarations>
+      $<$<CXX_COMPILER_ID:AppleClang>:-Wno-deprecated-declarations>)
 
-add_test(NAME soci_empty_backend
-  WORKING_DIRECTORY "$<TARGET_FILE_DIR:soci_empty_backend>"
-  COMMAND "$<TARGET_FILE:soci_empty_backend>")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set_property(TARGET ${target} PROPERTY CXX_STANDARD ON)
+    set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
+  endif()
+
+  add_test(NAME ${target}
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:${target}>
+    COMMAND $<TARGET_FILE:${target}>)
+endfunction()
+
+add_executable(soci_empty_backend soci_empty_backend.cpp)
+setup_ctest(soci_empty_backend)
 
 add_executable(soci_mysql_backend soci_mysql_backend.cpp)
-target_link_libraries(soci_mysql_backend
-  PUBLIC
-    ${CONAN_LIBS})
-
-add_test(NAME soci_mysql_backend
-  WORKING_DIRECTORY "$<TARGET_FILE_DIR:soci_mysql_backend>"
-  COMMAND "$<TARGET_FILE:soci_mysql_backend>")
+setup_ctest(soci_mysql_backend)
 
 add_executable(soci_postgresql_backend soci_postgresql_backend.cpp)
-target_link_libraries(soci_postgresql_backend
-  PUBLIC
-    ${CONAN_LIBS})
-
-add_test(NAME soci_postgresql_backend
-  WORKING_DIRECTORY "$<TARGET_FILE_DIR:soci_postgresql_backend>"
-  COMMAND "$<TARGET_FILE:soci_postgresql_backend>")
+setup_ctest(soci_postgresql_backend)

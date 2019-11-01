@@ -33,7 +33,7 @@ class SociConan(ConanFile):
         "with_sqlite3": [True, False]
     }
     default_options = {
-        "shared": True,
+        "shared": False,
         "soci_cxx_c11":  False,
         "soci_tests": False,
         "with_boost": True,
@@ -48,23 +48,20 @@ class SociConan(ConanFile):
         "soci_postgresql_nosinglerowmode": False,
         "with_sqlite3": False
     }
-    generators = "cmake"
-    _source_subfolder = "source_subfolder"
-    _build_subfolder = "build_subfolder"
+    generators = "cmake", "cmake_find_package"
+    _cmake = None
 
-    def configure(self):
-        if (self.options.with_mysql and self.options.shared
-            and not tools.os_info.is_windows):
-            # If use mysql-connector-c and SOCI:shared=True on UNIX-like OS,
-            # link failed by ld command: "relocation R_X86_64_PC32 against symbol
-            # `key_memory_mysql_options' can not be used when making a shared
-            #  object; recompile with -fPIC
-            # /usr/bin/ld: final link failed: Bad value"
-            self.options["mysql-connector-c"].shared = True
+    @property
+    def _source_subfolder(self):
+        return "source_subfolder"
+
+    @property
+    def _build_subfolder(self):
+        return "build_subfolder"
 
     def requirements(self):
         if self.options.with_boost:
-            self.requires("boost/1.70.0@conan/stable")
+            self.requires("boost/1.70.0")
 
         if self.options.with_db2:
             # conan db2 library not found.
@@ -75,20 +72,20 @@ class SociConan(ConanFile):
             pass
 
         if self.options.with_mysql:
-            self.requires("mysql-connector-c/6.1.11@bincrafters/stable")
+            self.requires("mysql-connector-c/6.1.11")
 
         if self.options.with_odbc:
-            self.requires("odbc/2.3.7@bincrafters/stable")
+            self.requires("odbc/2.3.7")
 
         if self.options.with_oracle:
             # conan oracle library not found.
             pass
 
         if self.options.with_postgresql:
-            self.requires("libpq/9.6.9@bincrafters/stable")
+            self.requires("libpq/11.5")
 
         if self.options.with_sqlite3:
-            self.requires("sqlite3/3.25.3@bincrafters/stable")
+            self.requires("sqlite3/3.29.0")
 
     def source(self):
         # TODO: get source from archive after SOCI 4.0.0 released.
@@ -96,33 +93,33 @@ class SociConan(ConanFile):
         # tools.get("{0}/archive/{1}.tar.gz", source_url, self.version)
         # extracted_dir = self.name + "-" + self.version
         # os.rename(extracted_dir, self._source_subfolder)
-
         git = tools.Git(folder=self._source_subfolder)
         git.clone(url="https://github.com/SOCI/soci.git", branch="master")
 
     def _configure_cmake(self):
-        cmake = CMake(self)
+        if self._cmake:
+            return self._cmake = CMake(self)
 
-        cmake.definitions["SOCI_SHARED"] = self.options.shared
-        cmake.definitions["SOCI_STATIC"] = not self.options.shared
-        cmake.definitions["SOCI_CXX_C11"] = self.options.soci_cxx_c11
-        cmake.definitions["SOCI_TESTS"] = self.options.soci_tests
-        cmake.definitions["WITH_BOOST"] = self.options.with_boost
-        cmake.definitions["SOCI_EMPTY"] = self.options.soci_empty
-        cmake.definitions["WITH_DB2"] = self.options.with_db2
-        cmake.definitions["WITH_FIREBIRD"] = self.options.with_firebird
-        cmake.definitions["SOCI_FIREBIRD_EMBEDDED"] = \
+        self._cmake.definitions["SOCI_SHARED"] = self.options.shared
+        self._cmake.definitions["SOCI_STATIC"] = not self.options.shared
+        self._cmake.definitions["SOCI_CXX_C11"] = self.options.soci_cxx_c11
+        self._cmake.definitions["SOCI_TESTS"] = self.options.soci_tests
+        self._cmake.definitions["WITH_BOOST"] = self.options.with_boost
+        self._cmake.definitions["SOCI_EMPTY"] = self.options.soci_empty
+        self._cmake.definitions["WITH_DB2"] = self.options.with_db2
+        self._cmake.definitions["WITH_FIREBIRD"] = self.options.with_firebird
+        self._cmake.definitions["SOCI_FIREBIRD_EMBEDDED"] = \
                 self.options.soci_firebird_embedded
-        cmake.definitions["WITH_MYSQL"] = self.options.with_mysql
-        cmake.definitions["WITH_ODBC"] = self.options.with_odbc
-        cmake.definitions["WITH_ORACLE"] = self.options.with_oracle
-        cmake.definitions["WITH_POSTGRESQL"] = self.options.with_postgresql
-        cmake.definitions["SOCI_POSTGRESQL_NOSINGLEROWMODE"] = \
+        self._cmake.definitions["WITH_MYSQL"] = self.options.with_mysql
+        self._cmake.definitions["WITH_ODBC"] = self.options.with_odbc
+        self._cmake.definitions["WITH_ORACLE"] = self.options.with_oracle
+        self._cmake.definitions["WITH_POSTGRESQL"] = self.options.with_postgresql
+        self._cmake.definitions["SOCI_POSTGRESQL_NOSINGLEROWMODE"] = \
                 self.options.soci_postgresql_nosinglerowmode
-        cmake.definitions["WITH_SQLITE3"] = self.options.with_sqlite3
+        self._cmake.definitions["WITH_SQLITE3"] = self.options.with_sqlite3
 
-        cmake.configure(build_folder=self._build_subfolder)
-        return cmake
+        self._cmake.configure(build_folder=self._build_subfolder)
+        return self._cmake
 
     def build(self):
         cmake = self._configure_cmake()
@@ -175,5 +172,5 @@ class SociConan(ConanFile):
             self.cpp_info.libs.append("%ssoci_sqlite3%s" % lib_name_args)
 
         # All backend libraries of SOCI depend on soci_core.
-        # Add to the end of the library list so that soci_core is linked last. when linking.
+        # Add to the end of the library list so that soci_core is linked last.
         self.cpp_info.libs.append("%ssoci_core%s" % lib_name_args)
