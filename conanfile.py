@@ -23,8 +23,6 @@ class SociConan(ConanFile):
         "with_boost": [True, False],
         "soci_empty": [True, False],
         "with_db2": [True, False],
-        "with_firebird": [True, False],
-        "soci_firebird_embedded": [True, False],
         "with_mysql": [True, False],
         "with_odbc": [True, False],
         "with_oracle": [True, False],
@@ -39,8 +37,6 @@ class SociConan(ConanFile):
         "with_boost": True,
         "soci_empty": True,
         "with_db2": False,
-        "with_firebird": False,
-        "soci_firebird_embedded": False,
         "with_mysql": False,
         "with_odbc": False,
         "with_oracle": False,
@@ -65,10 +61,6 @@ class SociConan(ConanFile):
 
         if self.options.with_db2:
             # conan db2 library not found.
-            pass
-
-        if self.options.with_firebird:
-            # conan firebird library not found.
             pass
 
         if self.options.with_mysql:
@@ -107,9 +99,11 @@ class SociConan(ConanFile):
         self._cmake.definitions["WITH_BOOST"] = self.options.with_boost
         self._cmake.definitions["SOCI_EMPTY"] = self.options.soci_empty
         self._cmake.definitions["WITH_DB2"] = self.options.with_db2
-        self._cmake.definitions["WITH_FIREBIRD"] = self.options.with_firebird
-        self._cmake.definitions["SOCI_FIREBIRD_EMBEDDED"] = \
-                self.options.soci_firebird_embedded
+
+        # conan firebird library not found.
+        self._cmake.definitions["WITH_FIREBIRD"] = False
+        self._cmake.definitions["SOCI_FIREBIRD_EMBEDDED"] = False
+
         self._cmake.definitions["WITH_MYSQL"] = self.options.with_mysql
         self._cmake.definitions["WITH_ODBC"] = self.options.with_odbc
         self._cmake.definitions["WITH_ORACLE"] = self.options.with_oracle
@@ -152,9 +146,6 @@ class SociConan(ConanFile):
 
         if self.options.with_db2:
             self.cpp_info.libs.append("%ssoci_db2%s" % lib_name_args)
-
-        if self.options.with_firebird:
-            self.cpp_info.libs.append("%ssoci_firebird%s" % lib_name_args)
 
         if self.options.with_mysql:
             self.cpp_info.libs.append("%ssoci_mysql%s" % lib_name_args)
