@@ -24,7 +24,6 @@ class SociConan(ConanFile):
         "soci_empty": [True, False],
         "with_mysql": [True, False],
         "with_odbc": [True, False],
-        "with_oracle": [True, False],
         "with_postgresql": [True, False],
         "soci_postgresql_nosinglerowmode": [True, False],
         "with_sqlite3": [True, False]
@@ -37,7 +36,6 @@ class SociConan(ConanFile):
         "soci_empty": True,
         "with_mysql": False,
         "with_odbc": False,
-        "with_oracle": False,
         "with_postgresql": False,
         "soci_postgresql_nosinglerowmode": False,
         "with_sqlite3": False
@@ -62,10 +60,6 @@ class SociConan(ConanFile):
 
         if self.options.with_odbc:
             self.requires("odbc/2.3.7")
-
-        if self.options.with_oracle:
-            # conan oracle library not found.
-            pass
 
         if self.options.with_postgresql:
             self.requires("libpq/11.5")
@@ -102,7 +96,10 @@ class SociConan(ConanFile):
 
         self._cmake.definitions["WITH_MYSQL"] = self.options.with_mysql
         self._cmake.definitions["WITH_ODBC"] = self.options.with_odbc
-        self._cmake.definitions["WITH_ORACLE"] = self.options.with_oracle
+
+        # conan oracle library not found.
+        self._cmake.definitions["WITH_ORACLE"] = False
+
         self._cmake.definitions["WITH_POSTGRESQL"] = self.options.with_postgresql
         self._cmake.definitions["SOCI_POSTGRESQL_NOSINGLEROWMODE"] = \
                 self.options.soci_postgresql_nosinglerowmode
@@ -145,9 +142,6 @@ class SociConan(ConanFile):
 
         if self.options.with_odbc:
             self.cpp_info.libs.append("%ssoci_odbc%s" % lib_name_args)
-
-        if self.options.with_oracle:
-            self.cpp_info.libs.append("%ssoci_oracle%s" % lib_name_args)
 
         if self.options.with_postgresql:
             self.cpp_info.libs.append("%ssoci_postgresql%s" % lib_name_args)
